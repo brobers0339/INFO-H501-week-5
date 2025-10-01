@@ -10,12 +10,43 @@ def survival_demographics():
     df['age_group'] = pd.cut(df['Age'], bins=ages, labels=labels, right=True, include_lowest=True)
     df['age_group'] = df['age_group'].astype('category')
 
-    df_grouped = df.groupby(['Pclass', 'Sex', 'age_group']).agg(
+    age_grouped = df.groupby(['Pclass', 'Sex', 'age_group']).agg(
         n_passengers = ('PassengerId', 'count'),
         n_survivors = ('Survived', 'sum')
+    ).reset_index()
+    age_grouped['survival_rate'] = age_grouped['n_survivors'] / age_grouped['n_passengers']
+    return age_grouped
+
+def visualize_demographic():
+    grouped_df = survival_demographics()
+    women_filtered = grouped_df[
+        (grouped_df['Sex'] == 'female') & (grouped_df['age_group'].isin(['Teen','Adult']))
+    ]
+    #For answering this question, we will be using "women" as adult and teen females. Children will be any gender child. 
+    women_fig = px.bar(women_filtered, 
+                       x='Pclass', 
+                       y='survival_rate',
+                       color= 'age_group',
+                       barmode= 'group',
+                       title= 'Survival Rate for Adult and Teen Women by Class'
     )
-    df_grouped['survival_rate'] = df_grouped['n_survivors'] / df_grouped['n_passengers']
-    return df_grouped
+
+    women_fig.show()
+
+    children_filtered = grouped_df[
+        (grouped_df['age_group'] == 'Child')
+    ]
+
+    children_fig = px.bar(children_filtered,
+                          x= 'Pclass',
+                          y= 'survival_rate',
+                          color= 'Sex',
+                          barmode= 'group',
+                          title= 'Survival Rate for All Children by Class'
+    )
+
+    children_fig.show()
+
 
 def family_groups():
     df['family_size'] = df['Parch'] + df['SibSp'] + 1
@@ -23,12 +54,27 @@ def family_groups():
         n_passengers = ('PassengerId', 'count'),
         avg_fare = ('Fare', 'mean'),
         min_fare = ('Fare', 'min'),
-        max_fare = ('Fare', 'max')
-    )
+        max_fare = ('Fare', 'max'),
+    ).reset_index()
     return family_grouped
+
 
 def last_names():
     last_names = df['Name'].str.split(',', expand=True)[0].str.strip()
     return last_names.value_counts()
 
+#No, the table above and last name table do not agree with one another.
+#We can see from one of the first listings shows a family value of 9, 
+#but we can't see that value displayed in the table, meaning there are some discrepencies.
 
+def visualize_families():
+    #Does the class have any impact on average family size
+    mean_class_family_size = family_groups().groupby('Pclass')['family_size'].mean().reset_index()
+    #For answering this question, we will be using "women" as adult and teen females. Children will be any gender child. 
+    family_size_fig = px.bar(mean_class_family_size, 
+                       x='Pclass', 
+                       y='family_size',
+                       title= 'Average Family Size by Class'
+    )
+
+    family_size_fig.show()

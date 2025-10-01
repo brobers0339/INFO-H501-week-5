@@ -26,12 +26,3 @@ st.write("What are the 3 most common last names for each class?")
 # Generate and display the figure
 fig2 = visualize_families()
 st.plotly_chart(fig2, use_container_width=True)
-
-st.write(
-'''
-# Titanic Visualization Bonus
-'''
-)
-# Generate and display the figure
-fig3 = visualize_family_size()
-st.plotly_chart(fig3, use_container_width=True)

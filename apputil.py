@@ -5,6 +5,15 @@ df = pd.read_csv('https://raw.githubusercontent.com/leontoddjohnson/datasets/mai
 
 
 def survival_demographics():
+    """
+    Analyze survival patterns on the Titanic 
+    by passenger class, sex, and age group.
+
+    Returns:
+        Pandas DataFrame 
+            grouped by 'Pclass', 'Sex', and 'age_group'
+            with columns: 'n_passengers', 'n_survivors', and 'survival_rate'.
+    """
     ages = [0, 12, 19, 59, float('inf')]
     labels = ['Child', 'Teen', 'Adult', 'Senior']
     df['age_group'] = pd.cut(df['Age'], bins=ages, labels=labels, right=True, include_lowest=True)
@@ -18,6 +27,14 @@ def survival_demographics():
     return age_grouped
 
 def visualize_demographic():
+    """
+    Visualize survival patterns found in the above function (survival_demographics).
+
+    Returns:
+        Two plotly visualizations to visualize:
+            survival rate by class of adult and teen women,
+            survival rate by class of all children (male and female).
+    """
     grouped_df = survival_demographics()
     women_filtered = grouped_df[
         (grouped_df['Sex'] == 'female') & (grouped_df['age_group'].isin(['Teen','Adult']))
@@ -49,6 +66,17 @@ def visualize_demographic():
 
 
 def family_groups():
+    """
+    Analyze family size patterns on the Titanic 
+    by passenger class and a calculate family size.
+    Family size is calculated by adding parents, children, siblings,
+    spouse, and themselves before adding the value to the dataset in a column.
+
+    Returns:
+        Pandas DataFrame 
+            grouped by 'Pclass' and 'family_size'
+            with columns: 'n_passengers', 'avg_fare', 'min_fare', and 'max_fare'.
+    """
     df['family_size'] = df['Parch'] + df['SibSp'] + 1
     family_grouped = df.groupby(['Pclass', 'family_size']).agg(
         n_passengers = ('PassengerId', 'count'),
@@ -60,6 +88,15 @@ def family_groups():
 
 
 def last_names():
+    """
+    List all of the last_names in the Titanic dataset
+    and determine the count of instances for that last name.
+
+    Returns:
+        Pandas Series 
+            keys are the last names in the dataset,
+            values are the counts of instances of the last name.
+    """
     last_names = df['Name'].str.split(',', expand=True)[0].str.strip()
     return last_names.value_counts()
 
@@ -68,9 +105,14 @@ def last_names():
 #but we can't see that value displayed in the table, meaning there are some discrepencies.
 
 def visualize_families():
-    #Does the class have any impact on average family size
+    """
+    Visualize family size patterns found in the above function (family_groups).
+
+    Returns:
+        A plotly visualization to visualize:
+            average family size sorted by class.
+    """
     mean_class_family_size = family_groups().groupby('Pclass')['family_size'].mean().reset_index()
-    #For answering this question, we will be using "women" as adult and teen females. Children will be any gender child. 
     family_size_fig = px.bar(mean_class_family_size, 
                        x='Pclass', 
                        y='family_size',

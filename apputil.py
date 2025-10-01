@@ -11,7 +11,7 @@ def survival_demographics():
 
     Returns:
         Pandas DataFrame 
-            grouped by 'Pclass', 'Sex', and 'age_group'
+            grouped by 'pclass', 'Sex', and 'age_group'
             with columns: 'n_passengers', 'n_survivors', and 'survival_rate'.
     """
     ages = [0, 12, 19, 59, float('inf')]
@@ -19,7 +19,7 @@ def survival_demographics():
     df['age_group'] = pd.cut(df['Age'], bins=ages, labels=labels, right=True, include_lowest=True)
     df['age_group'] = df['age_group'].astype('category')
 
-    age_grouped = df.groupby(['Pclass', 'Sex', 'age_group']).agg(
+    age_grouped = df.groupby(['pclass', 'Sex', 'age_group']).agg(
         n_passengers = ('PassengerId', 'count'),
         n_survivors = ('Survived', 'sum')
     ).reset_index()
@@ -74,11 +74,11 @@ def family_groups():
 
     Returns:
         Pandas DataFrame 
-            grouped by 'Pclass' and 'family_size'
+            grouped by 'pclass' and 'family_size'
             with columns: 'n_passengers', 'avg_fare', 'min_fare', and 'max_fare'.
     """
     df['family_size'] = df['Parch'] + df['SibSp'] + 1
-    family_grouped = df.groupby(['Pclass', 'family_size']).agg(
+    family_grouped = df.groupby(['pclass', 'family_size']).agg(
         n_passengers = ('PassengerId', 'count'),
         avg_fare = ('Fare', 'mean'),
         min_fare = ('Fare', 'min'),
@@ -112,9 +112,9 @@ def visualize_families():
         A plotly visualization to visualize:
             average family size sorted by class.
     """
-    mean_class_family_size = family_groups().groupby('Pclass')['family_size'].mean().reset_index()
+    mean_class_family_size = family_groups().groupby('pclass')['family_size'].mean().reset_index()
     family_size_fig = px.bar(mean_class_family_size, 
-                       x='Pclass', 
+                       x='pclass', 
                        y='family_size',
                        title= 'Average Family Size by Class'
     )

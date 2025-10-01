@@ -41,7 +41,7 @@ def visualize_demographic():
     ]
     #For answering this question, we will be using "women" as adult and teen females. Children will be any gender child. 
     women_fig = px.bar(women_filtered, 
-                       x='Pclass', 
+                       x='pclass', 
                        y='survival_rate',
                        color= 'age_group',
                        barmode= 'group',
@@ -55,7 +55,7 @@ def visualize_demographic():
     ]
 
     children_fig = px.bar(children_filtered,
-                          x= 'Pclass',
+                          x= 'pclass',
                           y= 'survival_rate',
                           color= 'Sex',
                           barmode= 'group',
